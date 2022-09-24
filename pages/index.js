@@ -14,8 +14,8 @@ const submit = (e) => {
     .then((data) => {
       // console.log(data)
       const result = document.getElementById('result')
-      // result.innerHTML = `<a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`
-      result.innerHTML = `<p>${data.shortUrl}</p>`
+      result.innerHTML = `<a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`
+      // result.innerHTML = `<p>${data.shortUrl}</p>`
     })
 }
 
@@ -30,7 +30,7 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href='/'>Shorten!</a>
+          Welcome to <b href='/'>Shorten!</b>
         </h1>
 
         <p className={styles.description}>
