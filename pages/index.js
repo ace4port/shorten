@@ -14,7 +14,8 @@ const submit = (e) => {
     .then((data) => {
       // console.log(data)
       const result = document.getElementById('result')
-      result.innerHTML = `<a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`
+      // result.innerHTML = `<a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`
+      result.innerHTML = `<p>${data.shortUrl}</p>`
     })
 }
 
