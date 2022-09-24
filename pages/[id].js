@@ -6,7 +6,7 @@ const Redirect = ({ message }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer(timer - 1)
+      setTimer((timer) => timer - 1)
     }, 1000)
 
     setTimeout(() => {
