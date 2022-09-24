@@ -8,7 +8,7 @@ export default async function shorten(req, res) {
 
   // Process a POST request
   if (method === 'POST') {
-    const { url } = req.body
+    const { url, customUrl } = req.body
     // check if the url is valid
     const isValid = isUrl(url)
 
@@ -20,7 +20,23 @@ export default async function shorten(req, res) {
         res.status(200).json({ shortUrl: isAlreadyShortened.shortUrl, urlCode: isAlreadyShortened.urlCode })
       } else {
         // if not, create a new shortened url
-        const urlCode = nanoid(6)
+        const count = await Url.countDocuments()
+        if (count > 18) {
+          // if the count is greater than 18, delete the first one
+          // await Url.findOneAndDelete({}).exec()
+          // if count > 18 throw error
+          return res.status(400).json({ error: 'You have reached the limit of 20 urls' })
+        }
+
+        const urlCode = customUrl ?? nanoid(6)
+
+        if (customUrl) {
+          const isCustomUrlTaken = await Url.findOne({ urlCode: customUrl })
+          if (isCustomUrlTaken) {
+            return res.status(400).json({ error: 'Custom URL is already taken' })
+          }
+        }
+
         const shortenedUrl = `${process.env.BASE_URL}/${urlCode}`
         const newUrl = new Url({
           originalUrl: url,

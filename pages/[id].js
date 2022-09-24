@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+
 import Url from '../server/schema/URLSchema'
+import dbConnect from '../server/dbConnect'
 
 const Redirect = ({ message }) => {
   const [timer, setTimer] = useState(3)
@@ -45,6 +47,7 @@ export default Redirect
 // browser: String,
 
 export async function getServerSideProps(context) {
+  await dbConnect()
   const { id } = context.query
   let urlCode = id
 

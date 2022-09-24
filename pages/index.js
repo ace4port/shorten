@@ -1,10 +1,11 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 
 const submit = (e) => {
   e.preventDefault()
   const url = e.target.url.value
-  const data = { url }
+  const data = { url, customUrl: e.target.customUrl.value }
   fetch('/api/shorten', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -34,11 +35,12 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Get started by entering <code className={styles.code}>url</code>
+          Get started by entering <code className={styles.code}>url</code> or go to <Link href={'/all'}>all urls</Link>
         </p>
 
         <form onSubmit={submit}>
           <input type='text' name='url' placeholder='Enter URL' />
+          <input type='text' name='customUrl' placeholder='Custom Name' />
           <button>Shorten</button>
         </form>
 
