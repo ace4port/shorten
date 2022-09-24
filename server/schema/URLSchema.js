@@ -19,6 +19,12 @@ const UrlSchema = new mongoose.Schema(
       device: String,
       browser: String,
     },
+
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -2,10 +2,53 @@ import Url from '../../server/schema/URLSchema'
 import dbConnect from '../../server/lib/dbConntect'
 import { nanoid } from 'nanoid'
 
+import { unstable_getServerSession } from 'next-auth/next'
+import { authOptions } from './auth/[...nextauth]'
+
 export default async function shorten(req, res) {
   const { method } = req
   await dbConnect()
 
+  const session = await unstable_getServerSession(req, res, authOptions)
+  //   // Signed in
+  //   console.log('Session', JSON.stringify(session, null, 2))
+  // } else {
+  //   // Not Signed in
+  //   console.log('Session not found')
+  // }
+
+  if (session) {
+    console.log('Session', JSON.stringify(session, null, 2))
+
+    switch (method) {
+      case 'GET':
+        try {
+          const { urlCode } = req.query
+          const urls = await Url.find({ user: session.user.email, urlCode })
+          res.status(200).json({ success: true, data: urls })
+        } catch (error) {
+          res.status(400).json({ success: false })
+        }
+        break
+      case 'POST':
+        try {
+          const { url } = req.body
+          if (!isUrl(url)) {
+            return res.status(400).json({ success: false, error: 'Invalid URL' })
+          }
+          const code = nanoid(5)
+          const newUrl = await Url.create({ url, code, user: session.user._id })
+          res.status(201).json({ success: true, data: newUrl })
+        } catch (error) {
+          res.status(400).json({ success: false })
+        }
+        break
+      default:
+        res.status(400).json({ success: false })
+        break
+    }
+    res.end()
+  }
   // Process a POST request
   if (method === 'POST') {
     const { url, customUrl } = req.body

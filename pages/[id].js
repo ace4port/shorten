@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import Url from '../server/schema/URLSchema'
-import dbConnect from '../server/dbConnect'
+import dbConnect from '../server/lib/dbConntect'
 
 const Redirect = ({ message }) => {
   const [timer, setTimer] = useState(3)
