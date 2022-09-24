@@ -1,34 +1,114 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# URL Shortner app
 
-## Getting Started
+## Gist
 
-First, run the development server:
+Get a long url - return a shortened version.
+Redirect to full url
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Core - Shorten
+2. Analytics (click tracking), auto delete
+3. Customize url and limit
+4. Auth - set auth for email, pw/ sign in w/ google/ use next auth?
+5. Customize domain (domain integration)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+---
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Step 1: Core
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- Initialize code, get the core feature up and running
+- Choice - Nest JS, Next JS, Remix --> Nest - Next
+- DB choide - Redis MongoDB --> MongoDB
 
-## Learn More
+### API Routes
 
-To learn more about Next.js, take a look at the following resources:
+- POST
+  --> Check for valid url
+  --> Create a shortened string
+  --> Save shortened string to db
+  --> Return shortened url
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- GET
+  --> Check if record exists
+  --> If exists - get the record/original url
+  -- --> Redirect to original url/Send original url
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Kick off by making backend only
 
-## Deploy on Vercel
+#### NextJS MongoDB Mongoose
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### ~2hr 10min
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+---
+
+## Step 2: Analytics (click tracking), auto delete
+
+- Basic analytics (click tracking/no of visits/link)
+- Auto delete/remove after 6 months
+
+### API Routes
+
+- POST
+  --> Modify schema to include analytics info (clicks)
+  --> Add expires field to schema
+
+- GET
+  --> Add analytics when get (click++)
+
+- Deploy on live server and test/check
+
+### Deployed on vercel
+
+### Analytics - user browser, click, last updated
+
+### Expires not working ...
+
+---
+
+## Step 3: Custom url and limit
+
+- Ability to add custom url/link
+- Show all urls
+- Set limit 18/20/10
+
+### API Routes
+
+- POST
+  --> Check if url exists
+- GET
+  --> Get all urls
+
+---
+
+## Step 4: Auth and limit
+
+- Set auth
+- Use next auth
+- Ideally JWT and other options Github & Google
+- Link user to urls and limit ❌
+- Tailwind
+- Stylize
+
+---
+
+## Step 5: Polishing & Custom domain
+
+- Link user to urls and limit
+- Loading and error handle
+- Urls - edit and delete
+
+---
+
+## Additional
+
+- Custom domains
+- Redis as db
+- Dockerize
+- Testing Unit, Integration and E2E
+- Cloud deployment
+- Event scheduling/expiration - eg - Remove a link after certain days 1 week, 1 month, 1 year or 2 yrs max
+
+---
+
+https://github.com/ace4port/miniature-waddle

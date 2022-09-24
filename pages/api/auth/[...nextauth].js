@@ -1,8 +1,10 @@
 import NextAuth from 'next-auth'
-
+import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import GithubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
 // import EmailProvider from 'next-auth/providers/email'
+
+import clientPromise from '../../../server/lib/mongoDb'
 
 export const authOptions = {
   // Configure one or more authentication providers
@@ -28,6 +30,7 @@ export const authOptions = {
   //   // verifyRequest: '/auth/verify-request', // (used for check email message)
   //   // newUser: '/auth/new-user', // New users will be directed here on first sign in (leave the property out if not of interest)
   // },
+  adapter: MongoDBAdapter(clientPromise),
 }
 
 export default NextAuth(authOptions)
