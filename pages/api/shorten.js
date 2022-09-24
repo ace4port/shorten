@@ -41,7 +41,9 @@ export default async function shorten(req, res) {
   if (method === 'GET') {
     const { urlCode } = req.query
     // check if the urlCode is in the database
+    // const url = await Url.findOneAndUpdate({ urlCode: urlCode }, { $inc: { 'analytics.clicks': 1 } }, { new: true })
     const url = await Url.findOne({ urlCode: urlCode })
+
     if (url) {
       // if so, redirect to the original url
       res.redirect(url.originalUrl)
