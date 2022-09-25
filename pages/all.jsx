@@ -1,4 +1,6 @@
 import { Nav } from './index'
+import Url from '../server/schema/URLSchema'
+import dbConnect from '../server/lib/dbConntect'
 
 const AllUrls = ({ urls }) => {
   return (
@@ -6,12 +8,12 @@ const AllUrls = ({ urls }) => {
       <Nav />
       <h1 className='text-4xl py-4'>AllUrls</h1>
       <div className='flex items-center justify-between'>
-        <span className='text-2xl text-gray-400'>({urls.urls.length})</span>
+        <span className='text-2xl text-gray-400'>({urls.length})</span>
       </div>
 
       <div>
-        {urls.urls &&
-          urls.urls.map((url) => (
+        {urls &&
+          urls.map((url) => (
             <div className='flex justify-between' key={url.urlCode}>
               <a className='overflow-hidden max-w-[350px]' href={url.url}>
                 {url.originalUrl}
@@ -29,10 +31,10 @@ const AllUrls = ({ urls }) => {
 export default AllUrls
 
 export async function getStaticProps() {
-  const res = await fetch('http://localhost:3000/api/getAll')
-  const urls = await res.json()
+  await dbConnect()
+  const urls = await Url.find({})
 
   return {
-    props: { urls },
+    props: { urls: JSON.parse(JSON.stringify(urls)) },
   }
 }

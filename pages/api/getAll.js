@@ -2,8 +2,9 @@ import Url from '../../server/schema/URLSchema'
 import dbConnect from '../../server/lib/dbConntect'
 
 export default async function shorten(req, res) {
-  const { method } = req
   await dbConnect()
+
+  const { method } = req
 
   // Process a GET request
   if (method === 'GET') {
