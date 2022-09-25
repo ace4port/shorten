@@ -47,7 +47,7 @@ export default async function shorten(req, res) {
         res.status(400).json({ success: false })
         break
     }
-    res.end()
+    return res.end()
   }
   // Process a POST request
   if (method === 'POST') {
@@ -60,7 +60,7 @@ export default async function shorten(req, res) {
       const isAlreadyShortened = await Url.findOne({ originalUrl: url })
       if (isAlreadyShortened) {
         // if so, return the shortened url
-        res.status(200).json({ shortUrl: isAlreadyShortened.shortUrl, urlCode: isAlreadyShortened.urlCode })
+        return res.status(200).json({ shortUrl: isAlreadyShortened.shortUrl, urlCode: isAlreadyShortened.urlCode })
       } else {
         // if not, create a new shortened url
         const count = await Url.countDocuments()
@@ -89,7 +89,7 @@ export default async function shorten(req, res) {
         // save to database
         await newUrl.save()
         // return the shortened url
-        res.status(201).json({ shortUrl: shortenedUrl, urlCode: urlCode })
+        return res.status(201).json({ shortUrl: shortenedUrl, urlCode: urlCode })
       }
     } else {
       res.status(400).json({ message: 'Invalid URL' })
