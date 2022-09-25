@@ -94,7 +94,7 @@ Redirect to full url
 
 ## Step 5: Polishing & Custom domain
 
-- Link user to urls and limit
+- Link user to urls and implement limit
 - Loading and error handle
 - Urls - edit and delete
 
