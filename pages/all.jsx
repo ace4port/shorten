@@ -1,5 +1,9 @@
+import { unstable_getServerSession } from 'next-auth/next'
+import { authOptions } from './api/auth/[...nextauth]'
+
 import { Nav } from './index'
 import Url from '../server/schema/URLSchema'
+import User from '../server/schema/User'
 import dbConnect from '../server/lib/dbConntect'
 
 const AllUrls = ({ urls }) => {
@@ -30,9 +34,17 @@ const AllUrls = ({ urls }) => {
 
 export default AllUrls
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
   await dbConnect()
-  const urls = await Url.find({})
+  const session = await unstable_getServerSession(context.req, context?.res, authOptions)
+
+  let urls
+  if (session) {
+    const user = await User.findOne({ user: session.email })
+    urls = await Url.find({ user: user._id })
+  } else {
+    urls = await Url.find()
+  }
 
   return {
     props: { urls: JSON.parse(JSON.stringify(urls)) },

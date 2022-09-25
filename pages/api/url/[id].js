@@ -1,58 +1,59 @@
-// // SAMPLE CODE
+import { unstable_getServerSession } from 'next-auth/next'
+import { authOptions } from '../auth/[...nextauth]'
 
-// import dbConnect from '../../../lib/dbConnect'
-// import Pet from '../../../models/Pet'
+import dbConnect from '../../../server/lib/dbConntect'
+import Url from '../../../server/schema/URLSchema'
+import User from '../../../server/schema/User'
 
-// export default async function handler(req, res) {
-//   const {
-//     query: { id },
-//     method,
-//   } = req
+export default async function shorten(req, res) {
+  const { method, query } = req
+  let { urlCode } = query
+  await dbConnect()
 
-//   await dbConnect()
+  const session = await unstable_getServerSession(req, res, authOptions)
 
-//   switch (method) {
-//     case 'GET' /* Get a model by its ID */:
-//       try {
-//         const pet = await Pet.findById(id)
-//         if (!pet) {
-//           return res.status(400).json({ success: false })
-//         }
-//         res.status(200).json({ success: true, data: pet })
-//       } catch (error) {
-//         res.status(400).json({ success: false })
-//       }
-//       break
+  if (session) {
+    const user = await User.findOne({ email: session.user.email })
 
-//     case 'PUT' /* Edit a model by its ID */:
-//       try {
-//         const pet = await Pet.findByIdAndUpdate(id, req.body, {
-//           new: true,
-//           runValidators: true,
-//         })
-//         if (!pet) {
-//           return res.status(400).json({ success: false })
-//         }
-//         res.status(200).json({ success: true, data: pet })
-//       } catch (error) {
-//         res.status(400).json({ success: false })
-//       }
-//       break
+    switch (method) {
+      case 'GET' /* Get a model by its ID */:
+        try {
+          const url = await Url.findOne({ user: user._id, urlCode })
+          if (!url) return res.status(404).json({ success: false, message: 'No url found' })
+          res.redirect(url.originalUrl)
+        } catch (error) {
+          res.status(400).json({ success: false })
+        }
+        break
 
-//     case 'DELETE' /* Delete a model by its ID */:
-//       try {
-//         const deletedPet = await Pet.deleteOne({ _id: id })
-//         if (!deletedPet) {
-//           return res.status(400).json({ success: false })
-//         }
-//         res.status(200).json({ success: true, data: {} })
-//       } catch (error) {
-//         res.status(400).json({ success: false })
-//       }
-//       break
+      case 'PUT' /* Edit a model by its ID */:
+        try {
+          const url = await Url.findOneAndUpdate({ user: user._id, urlCode }, req.body, {
+            new: true,
+            runValidators: true,
+          })
+          if (!url) return res.status(404).json({ success: false, message: 'No url found' })
 
-//     default:
-//       res.status(400).json({ success: false })
-//       break
-//   }
-// }
+          res.status(200).json({ success: true, data: url })
+        } catch (error) {
+          res.status(400).json({ success: false })
+        }
+        break
+
+      case 'DELETE' /* Delete a model by its ID */:
+        try {
+          const deletedUrl = await Url.deleteOne({ user: user._id, urlCode })
+          if (!deletedUrl) return res.status(400).json({ success: false })
+
+          res.status(200).json({ success: true, data: {} })
+        } catch (error) {
+          res.status(400).json({ success: false })
+        }
+        break
+
+      default:
+        res.status(400).json({ success: false })
+        break
+    }
+  }
+}

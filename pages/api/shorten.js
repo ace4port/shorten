@@ -1,4 +1,5 @@
 import Url from '../../server/schema/URLSchema'
+import User from '../../server/schema/User'
 import dbConnect from '../../server/lib/dbConntect'
 import { nanoid } from 'nanoid'
 
@@ -10,21 +11,14 @@ export default async function shorten(req, res) {
   await dbConnect()
 
   const session = await unstable_getServerSession(req, res, authOptions)
-  //   // Signed in
-  //   console.log('Session', JSON.stringify(session, null, 2))
-  // } else {
-  //   // Not Signed in
-  //   console.log('Session not found')
-  // }
 
   if (session) {
-    console.log('Session', JSON.stringify(session, null, 2))
-
+    const user = await User.findOne({ email: session.user.email })
     switch (method) {
       case 'GET':
         try {
           const { urlCode } = req.query
-          const urls = await Url.find({ user: session.user.email, urlCode })
+          const urls = await Url.find({ user: user._id, urlCode })
           res.status(200).json({ success: true, data: urls })
         } catch (error) {
           res.status(400).json({ success: false })
@@ -32,19 +26,26 @@ export default async function shorten(req, res) {
         break
       case 'POST':
         try {
-          const { url } = req.body
+          const { url, customUrl } = req.body
           if (!isUrl(url)) {
             return res.status(400).json({ success: false, error: 'Invalid URL' })
           }
-          const code = nanoid(5)
-          const newUrl = await Url.create({ url, code, user: session.user._id })
-          res.status(201).json({ success: true, data: newUrl })
+
+          const isAlreadyShortened = await Url.findOne({ url, user: user._id })
+          if (isAlreadyShortened) return res.status(200).json({ urlCode: isAlreadyShortened.urlCode })
+
+          const count = await Url.countDocuments()
+          if (count > 50) return res.status(400).json({ error: 'You have reached the limit of 50 urls' })
+
+          const code = customUrl ?? nanoid(7)
+          const newUrl = await Url.create({ originalUrl: url, urlCode: code, user: user._id })
+          res.status(201).json({ success: true, data: { urlCode: newUrl.urlCode } })
         } catch (error) {
           res.status(400).json({ success: false })
         }
         break
       default:
-        res.status(400).json({ success: false })
+        res.status(400).json({ success: false, message: 'Invalid request' })
         break
     }
     return res.end()

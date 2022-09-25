@@ -5,28 +5,45 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 
-const submit = async (e, setError) => {
-  e.preventDefault()
-  const url = e.target.url.value
-  const data = { url, customUrl: e.target.customUrl.value }
-  fetch('/api/shorten', {
+async function createShortUrl(body) {
+  return fetch('/api/url', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      const result = document.getElementById('result')
-      result.innerHTML = `<a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`
-    })
-    .catch((err) => {
-      console.log(err, err.message)
-      setError(err?.message)
-    })
+    body: JSON.stringify(body),
+  }).then((res) => res.json())
 }
 
 export default function Home() {
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [result, setResult] = useState('')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const url = e.target.url.value
+    const data = { url, customUrl: e.target.customUrl.value }
+    setLoading(true)
+    setError('')
+
+    createShortUrl(data)
+      .then((data) => {
+        console.log(data)
+        if (data.urlCode) {
+          const shortURL = `${process.env.BASE_URL ?? 'http://localhost:3000'}/${data.urlCode}`
+          setResult(shortURL)
+          setLoading(false)
+        } else {
+          setResult('')
+          setError(data.error)
+          setLoading(false)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        setError(err.message)
+        setLoading(false)
+      })
+  }
 
   return (
     <div className='min-h-screen min-w-screen bg-black bg-opacity-90 text-white flex flex-col px-10'>
@@ -41,12 +58,10 @@ export default function Home() {
         <h1 className='text-4xl mt-40 mb-5'>
           Welcome to <b href='/'>Shorten!</b>
         </h1>
-
         <p className='text-2xl mb-20'>
           Get started by entering <code className='font-mono'>url</code>
         </p>
-
-        <form onSubmit={(e) => submit(e, setError)}>
+        <form onSubmit={handleSubmit}>
           <input
             type='text'
             name='url'
@@ -61,7 +76,23 @@ export default function Home() {
             Shorten
           </button>
         </form>
-        <div id='result' className='p-4 text-green-200'></div>
+
+        {!loading && result && (
+          <div className='mt-10'>
+            <p className='text-sm'>
+              Your shortened URL is: &nbsp;
+              <a href={result} target='_blank' className='text-md text-blue-400'>
+                {result}
+              </a>
+            </p>
+          </div>
+        )}
+
+        {loading && (
+          <div className='flex items-center justify-center my-2'>
+            <div className='loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6'></div>
+          </div>
+        )}
 
         {error && <p className='text-red-500'>{error}</p>}
       </main>

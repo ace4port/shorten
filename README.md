@@ -112,3 +112,15 @@ Redirect to full url
 ---
 
 https://github.com/ace4port/miniature-waddle
+
+## API
+
+- /api/url
+  -- > POST - create new short url
+  -- > GET - get all
+
+- /api/url
+  -- > GET - get short url, redirect
+  -- > POST -❌
+  -- > PUT - Modify/Edit
+  -- > DELETE - Remove
