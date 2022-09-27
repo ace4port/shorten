@@ -50,6 +50,8 @@ export default async function handler(req, res) {
     }
     return res.end()
   }
+
+  res.status(401).json({ success: false, message: 'Unauthorized' })
 }
 
 const isUrl = (url) => {

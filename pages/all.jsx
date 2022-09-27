@@ -10,12 +10,14 @@ const AllUrls = ({ urls }) => {
   return (
     <div className='min-h-screen min-w-screen bg-black text-white px-10'>
       <Nav />
-      <h1 className='text-4xl py-4'>AllUrls</h1>
       <div className='flex items-center justify-between'>
-        <span className='text-2xl text-gray-400'>({urls.length})</span>
+        <h1 className='text-4xl py-4'>AllUrls</h1>
+        <span className='text-2xl text-gray-400'>{urls.length}</span>
       </div>
 
       <div>
+        {!urls.length && <div className='text-2xl text-gray-400'>No Urls Found or You are not logged in.</div>}
+
         {urls &&
           urls.map((url) => (
             <div className='flex justify-between' key={url.urlCode}>
@@ -37,6 +39,8 @@ export default AllUrls
 export async function getServerSideProps(context) {
   await dbConnect()
   const session = await unstable_getServerSession(context.req, context?.res, authOptions)
+
+  if (!session) return { props: { urls: [] } }
 
   let urls
   if (session) {

@@ -34,7 +34,8 @@ export default function Home() {
           setLoading(false)
         } else {
           setResult('')
-          setError(data.error)
+          console.log(data)
+          setError(data.error || data.message)
           setLoading(false)
         }
       })
@@ -61,36 +62,37 @@ export default function Home() {
         <p className='text-2xl mb-20'>
           Get started by entering <code className='font-mono'>url</code>
         </p>
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit} className='flex flex-col'>
           <input
             type='text'
             name='url'
             placeholder='Enter long URL'
-            className='p-2 rounded w-96 mx-2 bg-slate-600'
+            className='p-2 rounded w-full bg-slate-600 block'
             required
           />
-          <input type='text' name='customUrl' placeholder='Custom URL' className='p-2 rounded mx-2 bg-slate-600' />
-          <button
-            className='bg-gray-600 p-2 rounded uppercase text-sm font-semibold text-blue-200 tracking-widest'
-            type='submit'>
-            Shorten
-          </button>
+
+          <div className='my-2 w-full flex  gap-4 justify-between'>
+            <input type='text' name='customUrl' placeholder='Custom URL' className='p-2 rounded bg-slate-600' />
+
+            <button
+              className='bg-slate-700 px-4 rounded uppercase font-semibold text-blue-200 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer'
+              type='submit'
+              disabled={loading}>
+              {loading && <SpinningLoader />}
+              Shorten
+            </button>
+          </div>
         </form>
 
         {!loading && result && (
           <div className='mt-10'>
             <p className='text-sm'>
               Your shortened URL is: &nbsp;
-              <a href={result} target='_blank' className='text-md text-blue-400'>
+              <a href={result} target='_blank' rel='noreferrer' className='text-md text-blue-400'>
                 {result}
               </a>
             </p>
-          </div>
-        )}
-
-        {loading && (
-          <div className='flex items-center justify-center my-2'>
-            <div className='loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6'></div>
           </div>
         )}
 
@@ -100,12 +102,30 @@ export default function Home() {
   )
 }
 
+const SpinningLoader = () => {
+  return (
+    <svg
+      className='animate-spin h-4 w-4 text-blue-400'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'>
+      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+      <path
+        className='opacity-75'
+        fill='currentColor'
+        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+    </svg>
+  )
+}
+
 export const Nav = () => {
   const { data: session, status } = useSession()
 
   return (
     <nav className='flex items-center justify-between py-2 border-b border-gray-700'>
-      <h4 className='text-2xl '>Shorten</h4>
+      <Link href='/'>
+        <span className='text-2xl cursor-pointer'>Shorten</span>
+      </Link>
 
       <div className='self-end'>
         {status === 'loading' && <p>Loading...</p>}

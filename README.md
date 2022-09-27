@@ -97,6 +97,7 @@ Redirect to full url
 - Link user to urls and implement limit
 - Loading and error handle
 - Urls - edit and delete
+- Handle for non logged in users
 
 ---
 
