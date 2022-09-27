@@ -86,7 +86,7 @@ const All = ({ urls }) => {
                 <td className='text-center'>{i + 1}</td>
 
                 <td className='text-center'>
-                  <a className='' href={url.originalUrl} target='_blank'>
+                  <a className='' href={url.originalUrl} target='_blank' rel='noreferrer'>
                     <span className=' max-w-[350px] text-ellipsis clear-both inline-block overflow-hidden whitespace-nowrap'>
                       {url.originalUrl}
                     </span>
