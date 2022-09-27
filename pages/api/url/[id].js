@@ -7,7 +7,7 @@ import User from '../../../server/schema/User'
 
 export default async function shorten(req, res) {
   const { method, query } = req
-  let { urlCode } = query
+  let { urlCode, id } = query
   await dbConnect()
 
   const session = await unstable_getServerSession(req, res, authOptions)
@@ -42,10 +42,10 @@ export default async function shorten(req, res) {
 
       case 'DELETE' /* Delete a model by its ID */:
         try {
-          const deletedUrl = await Url.deleteOne({ user: user._id, urlCode })
+          const deletedUrl = await Url.findByIdAndDelete(id)
           if (!deletedUrl) return res.status(400).json({ success: false })
 
-          res.status(200).json({ success: true, data: {} })
+          res.status(200).json({ success: true })
         } catch (error) {
           res.status(400).json({ success: false })
         }
