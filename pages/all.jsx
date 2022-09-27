@@ -2,6 +2,8 @@ import { unstable_getServerSession } from 'next-auth/next'
 import { authOptions } from './api/auth/[...nextauth]'
 
 import { Nav } from './index'
+import { getUrlLink } from '../src/utils/getUrlLink'
+
 import Url from '../server/schema/URLSchema'
 import User from '../server/schema/User'
 import dbConnect from '../server/lib/dbConntect'
@@ -18,13 +20,26 @@ const AllUrls = ({ urls }) => {
       <div>
         {!urls.length && <div className='text-2xl text-gray-400'>No Urls Found or You are not logged in.</div>}
 
+        <div className='flex justify-between font-bold'>
+          <p className=''>Original Url</p>
+
+          <p className=''>Shortned Link</p>
+
+          <p>Clicks </p>
+          <p>Date</p>
+        </div>
+
         {urls &&
           urls.map((url) => (
             <div className='flex justify-between' key={url.urlCode}>
-              <a className='overflow-hidden max-w-[350px]' href={url.url}>
-                {url.originalUrl}
+              <a className='' href={url.originalUrl} target='_blank'>
+                <span className=' max-w-[350px] text-ellipsis clear-both inline-block overflow-hidden whitespace-nowrap'>
+                  {url.originalUrl}
+                </span>
               </a>
-              <p className='text-gray-400 mx-4'>{url.urlCode}</p>
+              <a className='text-gray-400 mx-4' href={getUrlLink(url.urlCode)} target='_blank'>
+                {url.urlCode}
+              </a>
               <p>{url.analytics.clicks} </p>
               {new Date(url.analytics.lastClicked).toLocaleDateString()}
             </div>

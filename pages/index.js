@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+import { getUrlLink } from '../src/utils/getUrlLink'
 
 async function createShortUrl(body) {
   return fetch('/api/url', {
@@ -23,24 +24,18 @@ export default function Home() {
     const url = e.target.url.value
     const data = { url, customUrl: e.target.customUrl.value }
     setLoading(true)
+    setResult('')
     setError('')
 
     createShortUrl(data)
       .then((data) => {
-        console.log(data)
-        if (data.urlCode) {
-          const shortURL = `${process.env.BASE_URL ?? 'http://localhost:3000'}/${data.urlCode}`
-          setResult(shortURL)
-          setLoading(false)
-        } else {
-          setResult('')
-          console.log(data)
-          setError(data.error || data.message)
-          setLoading(false)
-        }
+        if (data.error) throw new Error(data.error)
+        // if (data.success) console.log('success')
+        const shortURL = getUrlLink(data.urlCode)
+        setResult(shortURL)
+        setLoading(false)
       })
       .catch((err) => {
-        console.log(err)
         setError(err.message)
         setLoading(false)
       })
@@ -131,13 +126,15 @@ export const Nav = () => {
         {status === 'loading' && <p>Loading...</p>}
         {status === 'unauthenticated' && <button onClick={() => signIn()}>Sign in</button>}
         {status === 'authenticated' && (
-          <div className='flex gap-2 items-center'>
+          <div className='flex gap-20 items-center'>
             <Link href={'/all'}> All Links</Link>
-            <Image className='rounded-full' src={session.user.image} width={20} height={20} alt='user image' />
-            <p>{session.user.name} </p>
-            <button className='bg-gray-600 py-1 px-2 rounded' onClick={() => signOut()}>
-              Sign Out
-            </button>
+            <div className='flex gap-2 items-center'>
+              <Image className='rounded-full' src={session.user.image} width={20} height={20} alt='user image' />
+              <p>{session.user.name} </p>
+              <button className='bg-gray-600 py-1 px-2 rounded' onClick={() => signOut()}>
+                Sign Out
+              </button>
+            </div>
           </div>
         )}
       </div>

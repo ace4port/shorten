@@ -1,10 +1,13 @@
 import { unstable_getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
-import { nanoid } from 'nanoid'
 
 import Url from '../../../server/schema/URLSchema'
 import User from '../../../server/schema/User'
 import dbConnect from '../../../server/lib/dbConntect'
+
+import { customAlphabet } from 'nanoid'
+
+const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 10)
 
 export default async function handler(req, res) {
   const { method } = req
@@ -31,15 +34,20 @@ export default async function handler(req, res) {
 
           if (!isUrl(url)) return res.status(400).json({ success: false, error: 'Invalid URL' })
 
-          const isAlreadyShortened = await Url.findOne({ url, user: user._id })
+          const isAlreadyShortened = await Url.findOne({ originalUrl: url, user: user._id })
           if (isAlreadyShortened) return res.status(200).json({ urlCode: isAlreadyShortened.urlCode })
+
+          if (customUrl) {
+            const isCustomUrlTaken = await Url.findOne({ urlCode: customUrl, user: user._id })
+            if (isCustomUrlTaken) return res.status(400).json({ success: false, error: 'Custom URL is already taken' })
+          }
 
           const count = await Url.countDocuments()
           if (count > 50) return res.status(400).json({ error: 'You have reached the limit of 50 urls' })
 
-          const code = customUrl ?? nanoid(7)
+          const code = customUrl || nanoid(7)
           const newUrl = await Url.create({ originalUrl: url, urlCode: code, user: user._id })
-          res.status(201).json({ success: true, data: { urlCode: newUrl.urlCode } })
+          res.status(201).json({ success: true, urlCode: newUrl.urlCode })
         } catch (error) {
           res.status(400).json({ success: false })
         }
